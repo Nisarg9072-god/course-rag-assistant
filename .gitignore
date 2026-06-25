@@ -1,0 +1,24 @@
+# Large generated files
+embedding.joblib
+
+# Audio and video source files
+audios/
+Video/
+
+# Generated text outputs
+prompt.txt
+response.txt
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+.env/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db

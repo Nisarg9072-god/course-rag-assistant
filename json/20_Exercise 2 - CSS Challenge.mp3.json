@@ -1,0 +1,691 @@
+{
+    "chunks": [
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 0.0,
+            "end": 3.4,
+            "text": " I gave you exercise 1, many of you solved it."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 3.4,
+            "end": 5.0,
+            "text": " I also gave you a shoutout."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 5.0,
+            "end": 7.4,
+            "text": " Now it's time for exercise 2."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 7.4,
+            "end": 10.0,
+            "text": " And in this, we will do a challenge of CSS."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 10.0,
+            "end": 12.6,
+            "text": " Irrespective of how many people are going to solve it,"
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 12.6,
+            "end": 15.8,
+            "text": " you guys write Challenge Accepted in the comment section below."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 15.8,
+            "end": 17.8,
+            "text": " Maintain high energy like this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 17.8,
+            "end": 21.400000000000002,
+            "text": " And listen to the question carefully and comment your answers."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 21.400000000000002,
+            "end": 24.6,
+            "text": " Whoever writes Challenge Accepted first, I will give a heart."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 24.6,
+            "end": 28.6,
+            "text": " And whoever solves the question, will get a shoutout in the coming videos."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 28.6,
+            "end": 31.6,
+            "text": " I am very excited. Let's go to the computer screen."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 31.6,
+            "end": 33.2,
+            "text": " Let's roll the intro."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 33.2,
+            "end": 41.6,
+            "text": " Intro"
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 41.6,
+            "end": 43.6,
+            "text": " So guys, I have come inside the computer screen."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 43.6,
+            "end": 45.6,
+            "text": " And now I am going to give you exercise."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 45.6,
+            "end": 47.6,
+            "text": " So here I will do the first thing."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 47.6,
+            "end": 50.6,
+            "text": " I will make a folder named Video 20."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 50.6,
+            "end": 53.6,
+            "text": " So I will make a folder named Video 20."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 53.6,
+            "end": 57.6,
+            "text": " And here I will simply open it by pressing Shift-Right-Click."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 57.6,
+            "end": 59.6,
+            "text": " Now listen to me carefully."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 59.6,
+            "end": 62.2,
+            "text": " I am giving you an exercise of CSS."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 62.2,
+            "end": 64.2,
+            "text": " In which you have to do is,"
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 64.2,
+            "end": 68.2,
+            "text": " If you are going to get a paragraph,"
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 68.2,
+            "end": 71.8,
+            "text": " So if there is a first paragraph in any div,"
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 71.8,
+            "end": 75.4,
+            "text": " You have to make the background yellow and the color red."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 75.4,
+            "end": 77.4,
+            "text": " And you have to make 5 such divs."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 77.4,
+            "end": 80.0,
+            "text": " And you have to make a CSS class."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 80.0,
+            "end": 82.0,
+            "text": " In which you have to give this styling."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 82.0,
+            "end": 83.6,
+            "text": " So I frame this question."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 83.6,
+            "end": 85.2,
+            "text": " So here I have written the question."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 85.2,
+            "end": 88.8,
+            "text": " HTML and CSS code to style a paragraph inside a div."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 88.8,
+            "end": 92.2,
+            "text": " Such that the first paragraph must have a background color yellow."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 92.2,
+            "end": 93.2,
+            "text": " And text color red."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 93.2,
+            "end": 97.0,
+            "text": " So here you have seen that the first paragraph."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 97.0,
+            "end": 98.4,
+            "text": " Its background color should be yellow."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 98.4,
+            "end": 99.60000000000001,
+            "text": " And text color red."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 99.60000000000001,
+            "end": 109.2,
+            "text": " And the other paragraphs must have background color blue."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 109.2,
+            "end": 112.2,
+            "text": " And text color white."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 112.2,
+            "end": 114.2,
+            "text": " So I will comment this out."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 114.2,
+            "end": 116.8,
+            "text": " So that it does not interfere with our code."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 116.8,
+            "end": 118.8,
+            "text": " And here I am going to write HTML code."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 118.8,
+            "end": 119.8,
+            "text": " So this is for you."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 119.8,
+            "end": 122.4,
+            "text": " lorem 23."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 122.4,
+            "end": 124.0,
+            "text": " And along with that here."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 124.0,
+            "end": 127.2,
+            "text": " I am another para."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 127.2,
+            "end": 129.2,
+            "text": " Okay, now I have written like this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 129.2,
+            "end": 132.2,
+            "text": " And I will make two divs like this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 132.2,
+            "end": 133.6,
+            "text": " And I will write p here."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 133.6,
+            "end": 136.0,
+            "text": " I am also another para."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 136.0,
+            "end": 139.0,
+            "text": " And here I will make two divs like this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 139.0,
+            "end": 139.8,
+            "text": " Okay."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 139.8,
+            "end": 141.4,
+            "text": " And here you can see."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 141.4,
+            "end": 144.4,
+            "text": " That we have to write CSS rules like this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 144.4,
+            "end": 148.20000000000002,
+            "text": " Such that the first paragraph of you."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 148.20000000000002,
+            "end": 150.20000000000002,
+            "text": " This paragraph inside the div."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 150.20000000000002,
+            "end": 152.20000000000002,
+            "text": " Its styling should be different."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 152.20000000000002,
+            "end": 154.8,
+            "text": " And the styling of these paragraphs should be different."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 154.8,
+            "end": 157.20000000000002,
+            "text": " You do not have to put class in the paragraph."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 157.20000000000002,
+            "end": 159.20000000000002,
+            "text": " Now do not say that I will put class in this paragraph."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 159.20000000000002,
+            "end": 162.8,
+            "text": " No, you do not have to do any mess in HTML."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 162.8,
+            "end": 164.8,
+            "text": " Okay, do not touch the HTML."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 164.8,
+            "end": 165.6,
+            "text": " I will write it for you."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 165.6,
+            "end": 169.20000000000002,
+            "text": " Do not change this HTML."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 169.20000000000002,
+            "end": 170.6,
+            "text": " Okay, this HTML should not be changed."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 170.6,
+            "end": 172.0,
+            "text": " This is our condition."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 172.0,
+            "end": 174.6,
+            "text": " Okay, I hope you understood the question well."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 174.6,
+            "end": 178.0,
+            "text": " So if I preview this HTML."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 178.0,
+            "end": 180.0,
+            "text": " You can see that it will look like this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 180.0,
+            "end": 181.2,
+            "text": " It is a very simple HTML."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 181.2,
+            "end": 183.4,
+            "text": " And this question is very basic."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 183.4,
+            "end": 185.2,
+            "text": " What happened in the last video?"
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 185.2,
+            "end": 186.6,
+            "text": " Very few people answered."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 186.6,
+            "end": 187.79999999999998,
+            "text": " One thing I would like to tell you."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 187.79999999999998,
+            "end": 191.0,
+            "text": " That you write the challenge accepted in the comment section below."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 191.0,
+            "end": 193.0,
+            "text": " And if anyone is solving this question."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 193.0,
+            "end": 195.0,
+            "text": " Then you put a hashtag of solution."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 195.0,
+            "end": 196.6,
+            "text": " Okay, what hashtag will you put?"
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 196.6,
+            "end": 199.0,
+            "text": " Write the hashtag solution like this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 199.4,
+            "end": 203.2,
+            "text": " Write like this so that I can search."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 203.2,
+            "end": 204.2,
+            "text": " By putting the hashtag solution."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 204.2,
+            "end": 206.8,
+            "text": " And if the challenge is accepted, then write this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 206.8,
+            "end": 207.8,
+            "text": " Mandatory for all this."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 207.8,
+            "end": 209.8,
+            "text": " If you have not accessed the playlist yet."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 209.8,
+            "end": 211.2,
+            "text": " Access it."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 211.2,
+            "end": 213.6,
+            "text": " Along with that, I have given the source code here."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 213.6,
+            "end": 215.8,
+            "text": " You can go to this website for notes."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 215.8,
+            "end": 217.8,
+            "text": " And by clicking on notes here."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 217.8,
+            "end": 219.0,
+            "text": " You can access the notes."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 219.0,
+            "end": 221.0,
+            "text": " I have put all the notes here."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 221.0,
+            "end": 223.8,
+            "text": " You can download PDFs of HTML and CSS."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 223.8,
+            "end": 226.2,
+            "text": " And you can also download chapter wise."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 226.2,
+            "end": 227.6,
+            "text": " I need the solution of everyone."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 227.6,
+            "end": 228.6,
+            "text": " I am telling you."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 228.6,
+            "end": 230.79999999999998,
+            "text": " I hope you are enjoying this course."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 230.79999999999998,
+            "end": 232.6,
+            "text": " So that's it for this video."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 232.6,
+            "end": 234.4,
+            "text": " Thank you so much for watching this video."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 234.4,
+            "end": 237.0,
+            "text": " And I will see you next time."
+        },
+        {
+            "number": "20",
+            "title": "Exercise 2 - CSS Challenge",
+            "start": 237.0,
+            "end": 259.0,
+            "text": " Music."
+        }
+    ],
+    "text": " I gave you exercise 1, many of you solved it. I also gave you a shoutout. Now it's time for exercise 2. And in this, we will do a challenge of CSS. Irrespective of how many people are going to solve it, you guys write Challenge Accepted in the comment section below. Maintain high energy like this. And listen to the question carefully and comment your answers. Whoever writes Challenge Accepted first, I will give a heart. And whoever solves the question, will get a shoutout in the coming videos. I am very excited. Let's go to the computer screen. Let's roll the intro. Intro So guys, I have come inside the computer screen. And now I am going to give you exercise. So here I will do the first thing. I will make a folder named Video 20. So I will make a folder named Video 20. And here I will simply open it by pressing Shift-Right-Click. Now listen to me carefully. I am giving you an exercise of CSS. In which you have to do is, If you are going to get a paragraph, So if there is a first paragraph in any div, You have to make the background yellow and the color red. And you have to make 5 such divs. And you have to make a CSS class. In which you have to give this styling. So I frame this question. So here I have written the question. HTML and CSS code to style a paragraph inside a div. Such that the first paragraph must have a background color yellow. And text color red. So here you have seen that the first paragraph. Its background color should be yellow. And text color red. And the other paragraphs must have background color blue. And text color white. So I will comment this out. So that it does not interfere with our code. And here I am going to write HTML code. So this is for you. lorem 23. And along with that here. I am another para. Okay, now I have written like this. And I will make two divs like this. And I will write p here. I am also another para. And here I will make two divs like this. Okay. And here you can see. That we have to write CSS rules like this. Such that the first paragraph of you. This paragraph inside the div. Its styling should be different. And the styling of these paragraphs should be different. You do not have to put class in the paragraph. Now do not say that I will put class in this paragraph. No, you do not have to do any mess in HTML. Okay, do not touch the HTML. I will write it for you. Do not change this HTML. Okay, this HTML should not be changed. This is our condition. Okay, I hope you understood the question well. So if I preview this HTML. You can see that it will look like this. It is a very simple HTML. And this question is very basic. What happened in the last video? Very few people answered. One thing I would like to tell you. That you write the challenge accepted in the comment section below. And if anyone is solving this question. Then you put a hashtag of solution. Okay, what hashtag will you put? Write the hashtag solution like this. Write like this so that I can search. By putting the hashtag solution. And if the challenge is accepted, then write this. Mandatory for all this. If you have not accessed the playlist yet. Access it. Along with that, I have given the source code here. You can go to this website for notes. And by clicking on notes here. You can access the notes. I have put all the notes here. You can download PDFs of HTML and CSS. And you can also download chapter wise. I need the solution of everyone. I am telling you. I hope you are enjoying this course. So that's it for this video. Thank you so much for watching this video. And I will see you next time. Music."
+}
