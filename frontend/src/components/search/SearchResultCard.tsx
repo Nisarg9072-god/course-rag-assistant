@@ -55,7 +55,7 @@ export function SearchResultCard({ result, index }: SearchResultCardProps) {
 
         <div className="flex gap-2">
           <button
-            onClick={() => navigate(`/course/${result.number}?time=${Math.floor(result.start)}`)}
+            onClick={() => navigate(`/course/${result.number}?start=${Math.floor(result.start)}&end=${Math.ceil(result.end)}`)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition-colors"
           >
             <Play size={11} className="fill-white" />

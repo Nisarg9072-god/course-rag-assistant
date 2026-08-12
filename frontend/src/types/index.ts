@@ -24,6 +24,7 @@ export interface RAGSource {
   end: number;            // seconds
   text: string;
   similarity?: number;    // 0–1, optional
+  videoUrl?: string;      // /api/videos/N/stream
 }
 
 export interface RAGResponse {
