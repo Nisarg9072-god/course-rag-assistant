@@ -14,6 +14,7 @@ import { getVideo, getVideos } from '@/api/videos';
 import { markLessonComplete, isLessonCompleted } from '@/utils/storage';
 import { formatTime, padVideoNumber } from '@/utils/time';
 import { cn } from '@/utils/cn';
+import { USE_MOCK } from '@/api/client';
 
 type Tab = 'transcript' | 'ai';
 
@@ -60,10 +61,11 @@ export default function VideoPage() {
   }, [id]);
 
   // ── Video source ─────────────────────────────────────────────────────────────
-  // Prefer videoUrl from API response; fall back to constructing from number
-  const videoSrc = video?.videoUrl
-    ? video.videoUrl           // e.g. "/api/videos/18/stream" → proxied by Vite to :5000
-    : undefined;               // shows placeholder in mock mode with no backend
+  // Only use videoUrl when the real backend is running (USE_MOCK=false).
+  // In mock mode, we show a placeholder — there is no Flask server to stream from.
+  const videoSrc = (!USE_MOCK && video?.videoUrl)
+    ? video.videoUrl   // "/api/videos/18/stream" — proxied by Vite to :5000
+    : undefined;       // shows "Start backend" placeholder
 
   // ── Seek to startTime after metadata loads ───────────────────────────────────
   // This is handled inside VideoPlayer via the `seekOnLoad` prop below.
