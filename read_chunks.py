@@ -7,21 +7,31 @@ from sklearn.metrics.pairwise import cosine_similarity
 import joblib
 
 def create_embedding(text_lists):
-
     r = requests.post("http://localhost:11434/api/embed", json={
         "model": "bge-m3",
         "input": text_lists
-    })
+    }, timeout=120)
 
     if not r.ok:
         raise RuntimeError(f"Ollama API error {r.status_code}: {r.text}")
 
-    embedding = r.json()
+    data = r.json()
 
-    if "embeddings" not in embedding:
-        raise KeyError(f"'embeddings' key not found in response. Full response: {embedding}")
+    if "embeddings" not in data:
+        raise KeyError(f"'embeddings' key not found in response. Full response: {data}")
 
-    return embedding["embeddings"]
+    vecs = data["embeddings"]
+    if isinstance(vecs, dict):
+        # Some Ollama versions return {"0": [...], "1": [...]} instead of a list
+        vecs = [vecs[str(i)] for i in range(len(vecs))]
+    if not isinstance(vecs, list):
+        raise TypeError(f"Expected embeddings list, got {type(vecs)}: {data}")
+    if len(vecs) != len(text_lists):
+        raise RuntimeError(
+            f"Embedding count mismatch: got {len(vecs)} vectors for {len(text_lists)} texts"
+        )
+
+    return vecs
 
 
 BATCH_SIZE = 32
@@ -42,26 +52,33 @@ def batch_embed(texts, max_batches=None):
     return all_embeddings
 
 
-jsons =os.listdir("json")
+jsons = sorted(f for f in os.listdir("json") if f.endswith(".json"))
 
-my_dicts=[]
-chunk_id=0
-
+my_dicts = []
+chunk_id = 0
 
 for json_file in jsons:
-    with open(f"json/{json_file}")as f:
-        content = json.load(f)
-    print(f"creating Embeddings for {json_file}")
-    
-    embeddings = batch_embed([c["text"] for c in content['chunks']], max_batches=None)
+    try:
+        with open(f"json/{json_file}", encoding="utf-8") as f:
+            content = json.load(f)
+        chunks = content.get("chunks", [])
+        if not chunks:
+            print(f"  Skipping {json_file} — no chunks")
+            continue
 
-    for i, chunk in enumerate(content["chunks"][:len(embeddings)]):
-        chunk["chunk_id"] = chunk_id
-        chunk['embedding'] = embeddings[i]
-        chunk_id += 1
-        my_dicts.append(chunk)
-        
-    print(f"compeleted {json_file}") # test: only process first JSON file
+        print(f"creating Embeddings for {json_file}")
+        embeddings = batch_embed([c["text"] for c in chunks], max_batches=None)
+
+        for i, chunk in enumerate(chunks):
+            chunk["chunk_id"] = chunk_id
+            chunk["embedding"] = embeddings[i]
+            chunk_id += 1
+            my_dicts.append(chunk)
+
+        print(f"completed {json_file}")
+    except Exception as e:
+        print(f"ERROR processing {json_file}: {e}")
+        raise
 
 df = pd.DataFrame.from_records(my_dicts)
 # save this dataframe

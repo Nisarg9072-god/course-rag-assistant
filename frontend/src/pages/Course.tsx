@@ -6,16 +6,30 @@ import { LessonCard } from '@/components/course/LessonCard';
 import { getVideos, getStats } from '@/api/videos';
 import { getCompletedCount } from '@/utils/storage';
 import { formatDuration } from '@/utils/time';
+import type { CourseVideo } from '@/types';
+
+function hasProcessingVideos(videos: CourseVideo[]): boolean {
+  return videos.some(v => {
+    if (v.status === 'processing' || v.status === 'queued') return true;
+    const jobStatus = v.job?.status;
+    return jobStatus === 'queued' || jobStatus === 'processing';
+  });
+}
 
 export default function Course() {
-  const { data: videos = [], isLoading } = useQuery({
+  const { data: videos = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['videos'],
     queryFn: getVideos,
+    refetchInterval: (query) => {
+      const list = query.state.data ?? [];
+      return hasProcessingVideos(list) ? 4000 : false;
+    },
   });
 
   const { data: stats } = useQuery({
     queryKey: ['stats'],
     queryFn: getStats,
+    refetchInterval: hasProcessingVideos(videos) ? 4000 : false,
   });
 
   const completedCount = getCompletedCount();
@@ -79,6 +93,16 @@ export default function Course() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-16 rounded-xl bg-slate-100 dark:bg-white/[0.04] animate-pulse" />
             ))}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-12">
+            <p className="text-slate-500 mb-3">Unable to load videos.</p>
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium"
+            >
+              Retry
+            </button>
           </div>
         ) : (
           <div className="space-y-2">

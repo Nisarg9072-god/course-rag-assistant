@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, Clock, CheckCircle2 } from 'lucide-react';
+import { stageLabel } from '@/api/admin';
+import { Play, Clock, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import type { CourseVideo } from '@/types';
 import { formatDuration, padVideoNumber } from '@/utils/time';
 import { isLessonCompleted } from '@/utils/storage';
@@ -14,19 +15,22 @@ interface LessonCardProps {
 export function LessonCard({ video, index = 0 }: LessonCardProps) {
   const navigate = useNavigate();
   const completed = isLessonCompleted(video.number);
+  const isProcessing = video.status === 'processing' || video.status === 'queued';
+  const isFailed = video.status === 'failed';
+  const isReady = !video.status || video.status === 'ready';
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04 }}
-      onClick={() => navigate(`/course/${video.number}`)}
+      onClick={() => isReady && navigate(`/course/${video.number}`)}
       className={cn(
-        'group flex items-center gap-4 p-4 rounded-xl border cursor-pointer',
+        'group flex items-center gap-4 p-4 rounded-xl border',
         'bg-white dark:bg-[#18181f]',
         'border-slate-200 dark:border-white/[0.06]',
-        'hover:border-brand-300 dark:hover:border-brand-700',
-        'hover:shadow-sm transition-all duration-200',
+        isReady && 'cursor-pointer hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm transition-all duration-200',
+        !isReady && 'opacity-80',
       )}
     >
       {/* Number */}
@@ -50,10 +54,27 @@ export function LessonCard({ video, index = 0 }: LessonCardProps) {
           </span>
           <span className="text-xs text-slate-300 dark:text-slate-600">·</span>
           <span className="text-xs text-slate-400 dark:text-slate-500">{video.chunkCount} segments</span>
+          {isProcessing && (
+            <span className="flex items-center gap-1 text-xs text-amber-500">
+              <Loader2 size={11} className="animate-spin" />
+              {video.processingStage ? stageLabel(video.processingStage) : 'Processing'}
+            </span>
+          )}
+          {isFailed && (
+            <span className="flex items-center gap-1 text-xs text-red-500">
+              <AlertCircle size={11} /> Failed
+            </span>
+          )}
+          {isReady && (
+            <span className="flex items-center gap-1 text-xs text-emerald-500">
+              <CheckCircle2 size={11} /> Ready
+            </span>
+          )}
         </div>
       </div>
 
       {/* Play */}
+      {isReady && (
       <div className={cn(
         'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all',
         'bg-slate-100 dark:bg-white/[0.06] group-hover:bg-brand-600',
@@ -61,6 +82,7 @@ export function LessonCard({ video, index = 0 }: LessonCardProps) {
       )}>
         <Play size={14} className="fill-current ml-0.5" />
       </div>
+      )}
     </motion.div>
   );
 }

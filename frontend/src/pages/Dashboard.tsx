@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Sparkles, BookOpen, Layers, Cpu, ArrowRight, Clock } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { getStats } from '@/api/videos';
+import { getStats, getVideos } from '@/api/videos';
 import { useLocalHistory } from '@/hooks/useLocalHistory';
 import { timeAgo } from '@/utils/time';
 import { cn } from '@/utils/cn';
@@ -25,6 +25,20 @@ export default function Dashboard() {
     queryKey: ['stats'],
     queryFn: getStats,
   });
+
+  const { data: videos = [] } = useQuery({
+    queryKey: ['videos'],
+    queryFn: getVideos,
+    refetchInterval: (query) => {
+      const list = query.state.data ?? [];
+      return list.some(v => v.status === 'processing' || v.status === 'queued') ? 5000 : false;
+    },
+  });
+
+  const recentlyAdded = [...videos]
+    .filter(v => !v.status || v.status === 'ready')
+    .slice(-3)
+    .reverse();
 
   const handleAsk = (q?: string) => {
     const query = q || searchQuery;
@@ -178,6 +192,32 @@ export default function Dashboard() {
             <ArrowRight size={16} className="ml-auto text-brand-200" />
           </button>
         </motion.div>
+
+        {/* ── Recently added ──────────────────────────────────────────────── */}
+        {recentlyAdded.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28 }}
+            className="mb-12"
+          >
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">Recently added</h2>
+            <div className="space-y-2">
+              {recentlyAdded.map(v => (
+                <button
+                  key={v.number}
+                  onClick={() => navigate(`/course/${v.number}`)}
+                  className="w-full flex items-center justify-between p-3.5 bg-white dark:bg-[#18181f] rounded-xl border border-slate-200 dark:border-white/[0.06] hover:border-brand-300 text-left"
+                >
+                  <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                    #{String(v.number).padStart(2, '0')} {v.title}
+                  </span>
+                  <span className="text-xs text-emerald-500">✓ Ready</span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* ── Recent Questions ──────────────────────────────────────────────── */}
         {history.length > 0 && (

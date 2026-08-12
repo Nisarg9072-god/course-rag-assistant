@@ -6,7 +6,7 @@ import { ChatMessage } from '@/components/chat/ChatMessage';
 import { ChatInput } from '@/components/chat/ChatInput';
 import { ThinkingIndicator } from '@/components/chat/ThinkingIndicator';
 import type { ChatMessage as ChatMessageType } from '@/types';
-import { askQuestion } from '@/api/questions';
+import { askQuestion, askAboutVideo } from '@/api/questions';
 import { useLocalHistory } from '@/hooks/useLocalHistory';
 import { getChatHistory, saveChatHistory, clearChatHistory } from '@/utils/storage';
 
@@ -46,6 +46,9 @@ export default function AskAI() {
     if (loading) return;
     abortRef.current = false;
 
+    const scopedVideoId = params.get('videoId');
+    const vidNum = scopedVideoId ? parseInt(scopedVideoId, 10) : null;
+
     const userMsg: ChatMessageType = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -57,7 +60,9 @@ export default function AskAI() {
     pushHistory(question);
 
     try {
-      const response = await askQuestion(question);
+      const response = vidNum && !Number.isNaN(vidNum)
+        ? await askAboutVideo(question, vidNum)
+        : await askQuestion(question);
       if (abortRef.current) return;
 
       const aiMsg: ChatMessageType = {
@@ -82,7 +87,7 @@ export default function AskAI() {
     } finally {
       if (!abortRef.current) setLoading(false);
     }
-  }, [loading, pushHistory]);
+  }, [loading, pushHistory, params]);
 
   const handleClear = () => {
     setMessages([]);
@@ -100,7 +105,14 @@ export default function AskAI() {
             <Sparkles size={14} className="text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Course AI Assistant</h1>
+            <h1 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              Course AI Assistant
+              {params.get('videoId') && (
+                <span className="ml-2 text-xs font-normal text-brand-500">
+                  · Video #{params.get('videoId')}
+                </span>
+              )}
+            </h1>
             <p className="text-xs text-slate-400 dark:text-slate-500">Powered by LLaMA 3.2 + bge-m3</p>
           </div>
         </div>

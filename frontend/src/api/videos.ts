@@ -16,6 +16,14 @@ export async function getVideo(
   );
 }
 
+export async function getTranscript(id: number): Promise<{ videoId: number; chunks: TranscriptChunk[] }> {
+  if (USE_MOCK) {
+    const video = await mockGetVideo(id);
+    return { videoId: id, chunks: video.transcript };
+  }
+  return apiFetch<{ videoId: number; chunks: TranscriptChunk[] }>(`/api/videos/${id}/transcript`);
+}
+
 export async function getStats(): Promise<CourseStats> {
   if (USE_MOCK) return mockGetStats();
   return apiFetch<CourseStats>('/api/stats');

@@ -9,3 +9,14 @@ export async function askQuestion(question: string): Promise<RAGResponse> {
     body: JSON.stringify({ question }),
   });
 }
+
+export async function askAboutVideo(
+  question: string,
+  videoId: number,
+): Promise<RAGResponse> {
+  if (USE_MOCK) return mockAskQuestion(question);
+  return apiFetch<RAGResponse>('/api/ask/video', {
+    method: 'POST',
+    body: JSON.stringify({ question, videoId }),
+  });
+}

@@ -8,6 +8,7 @@ import {
 import { AnimatePresence } from 'framer-motion';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { AdminRoute } from '@/components/auth/AdminRoute';
 import { useTheme } from '@/hooks/useTheme';
 import Dashboard from '@/pages/Dashboard';
 import AskAI from '@/pages/AskAI';
@@ -15,6 +16,12 @@ import Course from '@/pages/Course';
 import VideoPage from '@/pages/VideoPlayer';
 import Search from '@/pages/Search';
 import About from '@/pages/About';
+import AdminDashboard from '@/pages/admin/AdminDashboard';
+import AdminVideos from '@/pages/admin/AdminVideos';
+import AdminAddVideo from '@/pages/admin/AdminAddVideo';
+import AdminJobs from '@/pages/admin/AdminJobs';
+import AdminVideoDetail from '@/pages/admin/AdminVideoDetail';
+import AdminLogin from '@/pages/admin/AdminLogin';
 
 // ── Inner layout (needs useLocation) ─────────────────────────────────────────
 function AppShell() {
@@ -25,36 +32,35 @@ function AppShell() {
 
   // Chat page needs a fixed-height, non-scrolling layout
   const isChat = location.pathname === '/ask';
+  const isLogin = location.pathname === '/admin/login';
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-[#0a0a0f]">
       {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-      <Sidebar
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(c => !c)}
-      />
+      {!isLogin && (
+        <Sidebar
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(c => !c)}
+        />
+      )}
 
       {/* ── Main column (shifts right on desktop to clear the sidebar) ───── */}
-      {/*
-        On large screens the sidebar is 240px expanded or 64px collapsed.
-        We use a CSS custom-property trick: the sidebar sets --sidebar-w via
-        its own animated width. Here we just replicate the same two values.
-      */}
       <div
         className={[
           'flex flex-col flex-1 min-w-0 transition-[margin] duration-200',
-          // Desktop: push content right by sidebar width
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60',
+          !isLogin && (sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-60'),
         ].join(' ')}
       >
         {/* Header */}
-        <Header
-          theme={theme}
-          onToggleTheme={toggleTheme}
-          onOpenSidebar={() => setSidebarOpen(true)}
-        />
+        {!isLogin && (
+          <Header
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            onOpenSidebar={() => setSidebarOpen(true)}
+          />
+        )}
 
         {/* Page area */}
         <div
@@ -73,6 +79,12 @@ function AppShell() {
               <Route path="/course/:videoId" element={<VideoPage />} />
               <Route path="/search"         element={<Search />} />
               <Route path="/about"          element={<About />} />
+              <Route path="/admin/login"    element={<AdminLogin />} />
+              <Route path="/admin"              element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/admin/videos"       element={<AdminRoute><AdminVideos /></AdminRoute>} />
+              <Route path="/admin/videos/add"    element={<AdminRoute><AdminAddVideo /></AdminRoute>} />
+              <Route path="/admin/videos/:videoId" element={<AdminRoute><AdminVideoDetail /></AdminRoute>} />
+              <Route path="/admin/jobs"          element={<AdminRoute><AdminJobs /></AdminRoute>} />
             </Routes>
           </AnimatePresence>
         </div>

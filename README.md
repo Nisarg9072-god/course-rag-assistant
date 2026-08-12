@@ -89,19 +89,53 @@ Go to: **http://localhost:5173**
 
 ---
 
+## 🎓 Dynamic Course Platform (Instructor)
+
+Instructors can add videos from the **Instructor** section in the sidebar:
+
+| Route | Purpose |
+|---|---|
+| `/admin` | Dashboard stats (videos, chunks, indexed %) |
+| `/admin/videos` | Manage all videos |
+| `/admin/videos/add` | Upload MP4 or add YouTube source |
+| `/admin/jobs` | Track background processing jobs |
+
+**Adding a video (automatic pipeline):**
+```
+Upload MP4 → Background job → FFmpeg audio → Whisper → Chunks → bge-m3 → ChromaDB → Ready
+```
+
+No need to run `video_to_mp3.py`, `mp3_to_json.py`, or `read_chunks.py` manually for new uploads.
+
+**Install full backend dependencies:**
+```bash
+pip install -r backend/requirements.txt
+```
+
+Requires **ffmpeg** on PATH for audio extraction.
+
+---
+
 ## 🗂️ Project Structure
 
 ```
 Project RAG/
 ├── backend/
-│   └── api.py              ← Flask REST API (run this)
+│   ├── api.py              ← Flask REST API
+│   ├── database.py         ← SQLite (videos, jobs, transcripts)
+│   ├── vector_store.py     ← ChromaDB incremental vectors
+│   ├── processor.py        ← Background ingestion pipeline
+│   └── seed.py             ← Migrates existing 21 videos on first run
+├── data/
+│   ├── course_rag.db       ← SQLite database (auto-created)
+│   └── chroma/             ← ChromaDB vector index (auto-created)
 ├── frontend/
 │   ├── src/                ← React + TypeScript source
 │   └── package.json
-├── json/                   ← Whisper transcripts (JSON chunks)
-├── Video/                  ← Your actual MP4 course videos
-├── embedding.joblib        ← Pre-computed embeddings (generated once)
-└── read_chunks.py          ← Embedding pipeline script
+├── json/                   ← Whisper transcripts (legacy + new uploads)
+├── Video/                  ← MP4 course videos
+├── embedding.joblib        ← Legacy embeddings (migrated to ChromaDB on startup)
+└── read_chunks.py          ← Manual embedding script (legacy)
 ```
 
 ---
@@ -118,14 +152,28 @@ Project RAG/
 
 ## 📁 Environment Variables
 
+### Backend (`backend/api.py`)
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `ADMIN_PASSWORD` | `changeme` | Instructor login password |
+| `FRONTEND_URL` | `http://localhost:5173` | Primary CORS origin |
+| `CORS_ORIGINS` | `FRONTEND_URL` + `:5174,:5175` | Comma-separated allowed origins |
+| `FLASK_DEBUG` | `true` | Set `false` in production |
+| `PORT` | `5000` | API port |
+| `OLLAMA_URL` | `http://localhost:11434` | Ollama API |
+| `MAX_UPLOAD_MB` | `2048` | Max MP4 upload size |
+
+### Frontend (`frontend/.env`)
+
 The frontend `.env` file controls mock vs real mode:
 
 ```env
 # File: frontend/.env
 
 VITE_API_URL=http://localhost:5000     # Flask backend URL
-VITE_USE_MOCK=true                     # true = demo mode (no backend needed)
-                                       # false = connects to real Flask API
+VITE_USE_MOCK=false                    # false = real backend + video playback (recommended)
+                                       # true = demo mode (no backend needed)
 ```
 
 **To use real AI + real videos:**
@@ -140,6 +188,22 @@ VITE_USE_MOCK=true
 
 ---
 
+## 🔐 Admin Authentication
+
+Instructor-only actions (upload, delete, retry, reprocess) require authentication.
+
+1. Set a strong password before starting the backend:
+   ```bash
+   set ADMIN_PASSWORD=your-secure-password
+   python backend/api.py
+   ```
+2. Open `/admin/login` in the app and sign in.
+3. Unauthenticated API calls to protected endpoints return **401 Unauthorized**.
+
+Students can still use Ask AI, view course videos, and read transcripts without logging in.
+
+---
+
 ## 🎬 Video Playback
 
 Videos are served from the `Video/` folder via:
@@ -151,16 +215,16 @@ The backend automatically finds the correct MP4 file by scanning for `Tutorial #
 
 ---
 
-## 🔁 Regenerating Embeddings
+## 🔁 Regenerating Embeddings (Legacy)
 
-If you add new transcripts to `json/`, regenerate the embeddings:
+For the original 21 videos, embeddings are migrated from `embedding.joblib` → ChromaDB on backend startup.
 
+To regenerate all legacy embeddings manually:
 ```bash
-cd "c:\Users\nisar\Desktop\DATA SCIENCE\Project RAG"
 python read_chunks.py
 ```
 
-This creates/updates `embedding.joblib`. Restart the Flask backend after.
+**New videos added via `/admin/videos/add` are embedded incrementally** — only the new video is processed.
 
 ---
 

@@ -9,12 +9,18 @@ import { useQuery } from '@tanstack/react-query';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { VideoPlayer } from '@/components/video/VideoPlayer';
 import type { VideoPlayerHandle } from '@/components/video/VideoPlayer';
+import { YouTubeEmbed } from '@/components/video/YouTubeEmbed';
 import { Transcript } from '@/components/video/Transcript';
+import { ThinkingIndicator } from '@/components/chat/ThinkingIndicator';
+import { stageLabel } from '@/api/admin';
 import { getVideo, getVideos } from '@/api/videos';
+import { askAboutVideo } from '@/api/questions';
+import { SourceCard } from '@/components/chat/SourceCard';
 import { markLessonComplete, isLessonCompleted } from '@/utils/storage';
 import { formatTime, padVideoNumber } from '@/utils/time';
+import { parseTimestampRange } from '@/utils/timestamp';
 import { cn } from '@/utils/cn';
-import { USE_MOCK } from '@/api/client';
+import { USE_MOCK, resolveApiUrl } from '@/api/client';
 
 type Tab = 'transcript' | 'ai';
 
@@ -29,8 +35,7 @@ export default function VideoPage() {
   // Accept both ?start=N&end=M (new, canonical) and ?time=N (legacy)
   const startParam = params.get('start') ?? params.get('time');
   const endParam   = params.get('end');
-  const startTime  = startParam ? Math.floor(Number(startParam)) : null;
-  const endTime    = endParam   ? Math.ceil(Number(endParam))    : null;
+  const { start: startTime, end: endTime } = parseTimestampRange(startParam, endParam);
   const hasSection = startTime !== null;
 
   // ── Data fetching ────────────────────────────────────────────────────────────
@@ -54,7 +59,11 @@ export default function VideoPage() {
   const [completed, setCompleted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [copied, setCopied]       = useState(false);
-  const [sectionActive, setSectionActive] = useState(false);  // true while playing section only
+  const [sectionActive, setSectionActive] = useState(false);
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiAnswer, setAiAnswer] = useState<string | null>(null);
+  const [aiSources, setAiSources] = useState<import('@/types').RAGSource[]>([]);
 
   useEffect(() => {
     setCompleted(isLessonCompleted(id));
@@ -64,8 +73,32 @@ export default function VideoPage() {
   // Only use videoUrl when the real backend is running (USE_MOCK=false).
   // In mock mode, we show a placeholder — there is no Flask server to stream from.
   const videoSrc = (!USE_MOCK && video?.videoUrl)
-    ? video.videoUrl   // "/api/videos/18/stream" — proxied by Vite to :5000
-    : undefined;       // shows "Start backend" placeholder
+    ? resolveApiUrl(video.videoUrl)
+    : undefined;
+
+  const isYoutube = video?.sourceType === 'youtube' && video?.youtubeVideoId;
+  const isProcessing = video?.status === 'processing' || video?.status === 'queued';
+  const isFailed = video?.status === 'failed';
+
+  const handleAskVideo = async () => {
+    if (!aiQuestion.trim() || aiLoading) return;
+    if (isProcessing) {
+      setAiAnswer('This video is still being processed. Try again once it is ready.');
+      return;
+    }
+    setAiLoading(true);
+    setAiAnswer(null);
+    setAiSources([]);
+    try {
+      const res = await askAboutVideo(aiQuestion.trim(), id);
+      setAiAnswer(res.answer);
+      setAiSources(res.sources ?? []);
+    } catch {
+      setAiAnswer('Could not get an answer. Make sure the backend and Ollama are running.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // ── Seek to startTime after metadata loads ───────────────────────────────────
   // This is handled inside VideoPlayer via the `seekOnLoad` prop below.
@@ -146,6 +179,34 @@ export default function VideoPage() {
               Back to course
             </button>
           </p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (isProcessing || isFailed) {
+    return (
+      <PageContainer>
+        <div className="max-w-xl mx-auto px-6 py-16 text-center">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+            #{padVideoNumber(video.number)} {video.title}
+          </h1>
+          {isProcessing ? (
+            <>
+              <p className="text-amber-600 font-medium mb-2">● Processing</p>
+              <p className="text-sm text-slate-500">
+                {video.processingStage ? stageLabel(video.processingStage) : 'Preparing video for AI search…'}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-red-500 font-medium mb-2">✕ Processing failed</p>
+              <p className="text-sm text-slate-500">{video.job?.errorMessage ?? 'An error occurred during processing.'}</p>
+            </>
+          )}
+          <button onClick={() => navigate('/course')} className="mt-6 text-brand-500 underline text-sm">
+            Back to course
+          </button>
         </div>
       </PageContainer>
     );
@@ -239,13 +300,24 @@ export default function VideoPage() {
           <div className="space-y-4">
             {/* Video player */}
             <div className="rounded-xl overflow-hidden bg-black shadow-xl shadow-black/30">
-              <VideoPlayer
-                ref={playerRef}
-                src={videoSrc}
-                seekOnLoad={startTime ?? undefined}
-                onTimeUpdate={handleTimeUpdate}
-                className="w-full aspect-video"
-              />
+              {isYoutube ? (
+                <YouTubeEmbed
+                  ref={playerRef}
+                  videoId={video.youtubeVideoId!}
+                  seekOnLoad={startTime ?? undefined}
+                  sectionEndTime={sectionActive && endTime != null ? endTime : null}
+                  onTimeUpdate={handleTimeUpdate}
+                  className="w-full aspect-video"
+                />
+              ) : (
+                <VideoPlayer
+                  ref={playerRef}
+                  src={videoSrc}
+                  seekOnLoad={startTime ?? undefined}
+                  onTimeUpdate={handleTimeUpdate}
+                  className="w-full aspect-video"
+                />
+              )}
             </div>
 
             {/* Relevant section info + controls */}
@@ -324,10 +396,16 @@ export default function VideoPage() {
                 </button>
               )}
               <button
-                onClick={() => navigate(`/ask?q=Tell me more about: ${video.title}`)}
+                onClick={() => { setTab('ai'); }}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-200 dark:border-brand-700/50 text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 text-sm font-medium transition-all"
               >
-                <Sparkles size={15} /> Ask AI about this lesson
+                <Sparkles size={15} /> Ask AI about this video
+              </button>
+              <button
+                onClick={() => navigate(`/ask?videoId=${id}`)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-brand-600 text-sm font-medium hover:underline"
+              >
+                Open full chat →
               </button>
             </div>
           </div>
@@ -361,7 +439,10 @@ export default function VideoPage() {
                     currentTime={currentTime}
                     highlightStart={hasSection ? startTime! : undefined}
                     highlightEnd={hasSection && endTime !== null ? endTime : undefined}
-                    onSeek={t => playerRef.current?.seekTo(t)}
+                    onSeek={t => {
+                      playerRef.current?.seekTo(t);
+                      setCurrentTime(t);
+                    }}
                   />
                 ) : (
                   <div className="p-6 text-center text-slate-400 dark:text-slate-500 text-sm">
@@ -369,20 +450,38 @@ export default function VideoPage() {
                   </div>
                 )
               ) : (
-                <div className="p-6 text-center">
-                  <Sparkles size={24} className="text-brand-400 mx-auto mb-3" />
-                  <p className="text-sm text-slate-700 dark:text-slate-300 font-medium mb-1">
-                    Ask about this lesson
+                <div className="p-4 flex flex-col gap-3 min-h-[280px]">
+                  <p className="text-xs text-slate-500">
+                    Ask questions scoped to this video only.
                   </p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
-                    Get AI explanations for anything in this video
-                  </p>
+                  <textarea
+                    value={aiQuestion}
+                    onChange={e => setAiQuestion(e.target.value)}
+                    placeholder="Explain this concept in simple language..."
+                    rows={3}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-transparent text-sm resize-none"
+                  />
                   <button
-                    onClick={() => navigate(`/ask?q=Explain what is covered in: ${video.title}`)}
-                    className="flex items-center gap-2 mx-auto px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition-colors"
+                    onClick={handleAskVideo}
+                    disabled={aiLoading || !aiQuestion.trim()}
+                    className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-semibold"
                   >
-                    <Sparkles size={13} /> Open AI Chat
+                    <Sparkles size={13} />
+                    {aiLoading ? 'Thinking...' : 'Ask AI'}
                   </button>
+                  {aiLoading ? (
+                    <ThinkingIndicator />
+                  ) : aiAnswer ? (
+                    <div className="space-y-3">
+                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{aiAnswer}</p>
+                      {aiSources.slice(0, 3).map((s, i) => (
+                        <SourceCard key={i} source={s} index={i} />
+                      ))}
+                    </div>
+                  ) : null}
+                  {!aiLoading && !aiAnswer && (
+                    <p className="text-xs text-slate-400 text-center">Answers use only this video&apos;s transcript.</p>
+                  )}
                 </div>
               )}
             </div>

@@ -2,11 +2,13 @@ import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Sparkles, BookOpen, Search, Info,
-  GraduationCap, ChevronLeft, ChevronRight, X
+  GraduationCap, ChevronLeft, ChevronRight, X,
+  Settings, Video, Plus, Loader2,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { getCompletedCount } from '@/utils/storage';
-import { MOCK_VIDEOS } from '@/api/mock';
+import { useQuery } from '@tanstack/react-query';
+import { getVideos } from '@/api/videos';
 
 interface SidebarProps {
   open: boolean;
@@ -23,10 +25,57 @@ const NAV = [
   { to: '/about',  icon: Info,            label: 'About'     },
 ];
 
+const INSTRUCTOR_NAV = [
+  { to: '/admin',           icon: Settings, label: 'Dashboard'       },
+  { to: '/admin/videos',    icon: Video,    label: 'Manage Videos'   },
+  { to: '/admin/videos/add', icon: Plus,    label: 'Add Video'       },
+  { to: '/admin/jobs',      icon: Loader2,  label: 'Processing Jobs' },
+];
+
 export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarProps) {
   const completedCount = getCompletedCount();
-  const total = MOCK_VIDEOS.length;
-  const pct = Math.round((completedCount / total) * 100);
+  const { data: videos = [] } = useQuery({ queryKey: ['videos'], queryFn: getVideos });
+  const total = videos.length || 21;
+  const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+  const renderNav = (items: typeof NAV) => items.map(({ to, icon: Icon, label }) => (
+    <NavLink
+      key={to}
+      to={to}
+      end={to === '/' || to === '/admin'}
+      onClick={() => { if (window.innerWidth < 1024) onClose(); }}
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium',
+          'transition-all duration-150 group relative',
+          isActive
+            ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400'
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-slate-100',
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon size={18} className={cn('shrink-0', isActive && 'text-brand-500')} />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="whitespace-nowrap"
+              >
+                {label}
+              </motion.span>
+            )}
+          </AnimatePresence>
+          {collapsed && (
+            <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-slate-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+              {label}
+            </div>
+          )}
+        </>
+      )}
+    </NavLink>
+  ));
 
   return (
     <>
@@ -80,45 +129,19 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
 
         {/* Nav */}
         <nav className="flex-1 py-4 px-2 space-y-0.5 overflow-y-auto">
-          {NAV.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              onClick={() => { if (window.innerWidth < 1024) onClose(); }}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium',
-                  'transition-all duration-150 group relative',
-                  isActive
-                    ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-slate-100',
-                )
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon size={18} className={cn('shrink-0', isActive && 'text-brand-500')} />
-                  <AnimatePresence>
-                    {!collapsed && (
-                      <motion.span
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="whitespace-nowrap"
-                      >
-                        {label}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                  {/* Tooltip when collapsed */}
-                  {collapsed && (
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-slate-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-                      {label}
-                    </div>
-                  )}
-                </>
-              )}
-            </NavLink>
-          ))}
+          {renderNav(NAV)}
+
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.p
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400"
+              >
+                Instructor
+              </motion.p>
+            )}
+          </AnimatePresence>
+          {renderNav(INSTRUCTOR_NAV)}
         </nav>
 
         {/* Progress */}
