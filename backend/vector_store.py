@@ -71,7 +71,7 @@ def _ensure_collection_compatible(sample_embedding) -> bool:
     try:
         peek = col.get(limit=1, include=["embeddings"])
         existing = peek.get("embeddings") or []
-        if existing and _embedding_dim(existing[0]) != expected:
+        if len(existing) > 0 and _embedding_dim(existing[0]) != expected:
             print(
                 f"[VectorStore] Embedding dimension mismatch "
                 f"(stored={_embedding_dim(existing[0])}, expected={expected}) — resetting index"

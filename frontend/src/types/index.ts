@@ -79,6 +79,8 @@ export interface RAGSource {
 export interface RAGResponse {
   answer: string;
   sources: RAGSource[];
+  intent?: 'VIDEO_QA' | 'QUIZ' | 'SUMMARY';
+  debug?: Record<string, unknown>;
 }
 
 export interface SearchResult {

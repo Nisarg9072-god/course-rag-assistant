@@ -66,6 +66,8 @@ import vector_store  # noqa: E402
 from processor import start_processing, compute_file_hash, extract_youtube_id, is_video_processing  # noqa: E402
 from seed import seed_from_legacy  # noqa: E402
 from auth import require_admin, verify_password, create_token, revoke_token, get_bearer_token  # noqa: E402
+import rag as rag_pipeline  # noqa: E402
+from rag import extract_video_number, filter_and_rank_hits, select_context_chunks, detect_intent  # noqa: E402
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -90,6 +92,50 @@ CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
 # ── Load embeddings once at startup ───────────────────────────────────────────
 df_lock = threading.Lock()
 df: pd.DataFrame = None  # type: ignore
+
+def _ensure_chroma_populated():
+    """Re-migrate joblib → Chroma if the vector index is nearly empty."""
+    if df is None or not vector_store.is_available():
+        return
+    chroma_count = vector_store.get_chunk_count()
+    joblib_count = len(df)
+    if chroma_count >= joblib_count * 0.9:
+        return
+    marker = vector_store.MIGRATION_MARKER
+    if marker.exists():
+        marker.unlink()
+    print(f"[API] ChromaDB under-populated ({chroma_count}/{joblib_count}) — re-migrating...")
+    vector_store.migrate_from_joblib(df)
+
+
+def _run_video_rag_response(
+    question: str,
+    vid_num: int,
+    db_row: dict,
+    debug: bool = False,
+) -> dict:
+    result = rag_pipeline.run_video_rag(
+        question,
+        vid_num,
+        db_row["title"],
+        db_row["id"],
+        embed_fn=create_embedding,
+        search_fn=find_similar_chunks,
+        llm_fn=llm_generate,
+        debug=debug,
+    )
+    sources = [_format_source(s) for s in result.get("sources", [])]
+    sources = _validate_sources(sources)
+    # Sources must match context used — use same chunks
+    resp = {
+        "answer": result["answer"],
+        "sources": sources,
+        "intent": result.get("intent"),
+    }
+    if debug and "debug" in result:
+        resp["debug"] = result["debug"]
+    return resp
+
 
 def load_embeddings():
     global df
@@ -579,42 +625,66 @@ def stream_video(video_id: int):
 def ask():
     """
     Ask a question. Returns AI answer + top source chunks.
-    Body: { "question": "What is the CSS box model?" }
+    Body: { "question": "What is the CSS box model?", "debug": false }
     """
     body = request.get_json(force=True)
     question = (body.get("question") or "").strip()
+    debug = bool(body.get("debug"))
     if not question:
         return jsonify({"error": "question is required"}), 400
 
     if df is None and not vector_store.is_available():
         return jsonify({"error": "Embeddings not loaded. Run read_chunks.py first."}), 503
 
+    # Route video-specific queries to scoped pipeline
+    detected_vid = extract_video_number(question)
+    if detected_vid is not None:
+        db_row = get_video_by_number(detected_vid)
+        if db_row and db_row.get("status") == "ready":
+            try:
+                return jsonify(_run_video_rag_response(question, detected_vid, db_row, debug=debug))
+            except http_requests.exceptions.ConnectionError:
+                return jsonify({"error": "Cannot connect to Ollama."}), 503
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+
     try:
         q_embedding = create_embedding(question)
-        similar = find_similar_chunks(q_embedding, top_k=TOP_RESULTS)
-        # Only ready videos in results
+        similar = find_similar_chunks(q_embedding, top_k=rag_pipeline.CANDIDATE_POOL)
         ready_nums = {v["number"] for v in parse_video_list(include_processing=False)}
         similar = [s for s in similar if s["number"] in ready_nums]
 
-        sources = [_format_source(s) for s in similar[:10]]
+        ranked = filter_and_rank_hits(similar, detect_intent(question))
+        context = select_context_chunks(ranked, "VIDEO_QA")[:rag_pipeline.MAX_CONTEXT_CHUNKS]
+
+        if not context:
+            return jsonify({
+                "answer": "I couldn't find enough relevant course content to answer that question.",
+                "sources": [],
+                "intent": "VIDEO_QA",
+            })
+
+        sources = [_format_source(s) for s in context[:rag_pipeline.MAX_SOURCE_CHUNKS]]
         sources = _validate_sources(sources)
 
         chunks_json = json.dumps([
             {"title": s["title"], "number": s["number"], "text": s["text"], "start": s["start"]}
-            for s in similar[:TOP_RESULTS]
+            for s in context
         ])
-        prompt = f"""I am teaching web development using the Sigma Web Development course. Here are video subtitle chunks containing video title, video number, start time in seconds, and the text:
+        prompt = f"""You are a course assistant for a web development course.
+
+Use ONLY the transcript chunks below. Do not invent timestamps or content.
+If the context is insufficient, say you could not find enough information.
 
 {chunks_json}
 
-------------------------------------
-"{question}"
+Question: "{question}"
 
-The user asked this question related to the video chunks. Answer in a human-friendly way — tell them where and at what timestamp this content is covered, and guide them to the specific video. If the question is unrelated to the course, politely say you can only answer course-related questions."""
+Answer clearly and cite which video/timestamp the content comes from."""
 
         answer = llm_generate(prompt)
-
-        return jsonify({"answer": answer, "sources": sources})
+        resp = {"answer": answer, "sources": sources, "intent": "VIDEO_QA"}
+        return jsonify(resp)
 
     except http_requests.exceptions.ConnectionError:
         return jsonify({
@@ -654,6 +724,7 @@ def ask_video():
     body = request.get_json(force=True)
     question = (body.get("question") or "").strip()
     video_id_param = body.get("videoId") or body.get("video_id")
+    debug = bool(body.get("debug"))
     if not question:
         return jsonify({"error": "question is required"}), 400
     if video_id_param is None:
@@ -674,27 +745,7 @@ def ask_video():
         return jsonify({"error": "Embeddings not loaded."}), 503
 
     try:
-        q_embedding = create_embedding(question)
-        similar = find_similar_chunks(
-            q_embedding, top_k=TOP_RESULTS, video_id=db_row["id"]
-        )
-        sources = [_format_source(s) for s in similar[:10]]
-        sources = _validate_sources(sources)
-        chunks_json = json.dumps([
-            {"title": s["title"], "number": s["number"], "text": s["text"], "start": s["start"]}
-            for s in similar[:TOP_RESULTS]
-        ])
-        prompt = f"""You are helping a student who is watching Video #{vid_num}: "{db_row['title']}".
-Answer ONLY using the transcript chunks from this video below.
-
-{chunks_json}
-
-Question: "{question}"
-
-Give a clear, simple explanation based on this video's content. Mention timestamps when relevant."""
-
-        answer = llm_generate(prompt)
-        return jsonify({"answer": answer, "sources": sources})
+        return jsonify(_run_video_rag_response(question, vid_num, db_row, debug=debug))
     except http_requests.exceptions.ConnectionError:
         return jsonify({"error": "Cannot connect to Ollama."}), 503
     except Exception as e:
@@ -1004,6 +1055,7 @@ if __name__ == "__main__":
         print(f"[API] Recovered {recovered} stale processing job(s)")
     seed_from_legacy()
     load_embeddings()
+    _ensure_chroma_populated()
     if df is not None:
         vector_store.migrate_from_joblib(df)
     port = int(os.environ.get("PORT", 5000))
