@@ -3,7 +3,7 @@ embedding.joblib
 
 # Audio and video source files
 audios/
-Video/
+/Video/
 
 # Generated text outputs
 prompt.txt
